@@ -1,0 +1,16 @@
+<launch>
+ <param name="lat_r" value="45.477669461666665" type="double"/>
+ <param name="lon_r" value="9.22674018" type="double"/>
+ <param name="alt_r" value="169.039" type="double"/>
+ <node pkg="first_project" name="gps_to_odom" type="gps_to_odom" output="screen" />
+ <node pkg="first_project" name="gps_odom_to_tf" type="odom_to_tf" output="screen" >
+    <param name="input_odom" value="/gps_odom" type="str"/>
+    <param name="child_frame" value="gps_odom" type="str"/>
+    <param name="root_frame" value="world" type="str"/>
+</node>
+ <node pkg="first_project" name="wheel_odom_to_tf" type="odom_to_tf" output="screen" >
+    <param name="input_odom" value="/odom" type="str"/>
+    <param name="child_frame" value="wheel_odom" type="str"/>
+    <param name="root_frame" value="world" type="str"/>
+</node>
+</launch>
