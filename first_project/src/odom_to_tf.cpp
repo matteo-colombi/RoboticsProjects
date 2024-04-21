@@ -9,7 +9,7 @@
 class odom_to_tf {
 
 	private:
-		ros::NodeHandle n("~");
+        ros::NodeHandle n;
         ros::Subscriber sub;
         tf::TransformBroadcaster br;
         std::string input_odom, child_frame, root_frame;
@@ -24,9 +24,10 @@ class odom_to_tf {
         }
 
         odom_to_tf(){
-            n.getParam("input_odom", input_odom);
-            n.getParam("child_frame", child_frame);
-            n.getParam("root_frame", root_frame);
+            ros::NodeHandle n_private("~");
+            n_private.getParam("input_odom", input_odom);
+            n_private.getParam("child_frame", child_frame);
+            n_private.getParam("root_frame", root_frame);
             sub = n.subscribe<nav_msgs::Odometry>(input_odom, 1000, &odom_to_tf::odomCallBack, this);
         }
 };
