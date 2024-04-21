@@ -1,10 +1,7 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/NavSatFix.h"
-#include <stdlib.h>
-#include <cmath>  
-#include <sstream>
+#include "cmath"
 
 #define A 6378137
 #define B 6356752
@@ -47,6 +44,14 @@ class gps_to_odom {
 			}
 		}
 
+		void rotate(double *x, double *y) {
+			double xRotated, yRotated;
+			xRotated = cos(ANGLE_CORRECTION*M_PI/180.0)*(*x) - sin(ANGLE_CORRECTION*M_PI/180.0)*(*y);
+			yRotated = sin(ANGLE_CORRECTION*M_PI/180.0)*(*x) + cos(ANGLE_CORRECTION*M_PI/180.0)*(*y);
+			*x = xRotated;
+			*y = yRotated;
+		}
+
 		nav_msgs::Odometry coordinateConvert(sensor_msgs::NavSatFix gpsPos){
 			nav_msgs::Odometry retval;
 			
@@ -61,25 +66,21 @@ class gps_to_odom {
 			double x, y, z;
 			ECEFtoENU(&x, &y, &z, X, Y, Z);
 
+			rotate(&x, &y);
+
 			double dx = x-xPrev;
 			double dy = y-yPrev;
 
 			updateHeading(dx, dy);
-
-			double xRotated, yRotated;
-			xRotated = cos(ANGLE_CORRECTION*M_PI/180.0)*x - sin(ANGLE_CORRECTION*M_PI/180.0)*y;
-			yRotated = sin(ANGLE_CORRECTION*M_PI/180.0)*x + cos(ANGLE_CORRECTION*M_PI/180.0)*y;
-			x = xRotated;
-			y = yRotated;
 	
 			retval.pose.pose.position.x = x;
 			retval.pose.pose.position.y = y;
 			retval.pose.pose.position.z = z;
 
-			retval.pose.pose.orientation.w = sin(heading/2);
-			retval.pose.pose.orientation.z = cos(heading/2);
 			retval.pose.pose.orientation.x = 0;
 			retval.pose.pose.orientation.y = 0;
+			retval.pose.pose.orientation.z = sin(heading/2);
+			retval.pose.pose.orientation.w = cos(heading/2);
 
 			yPrev = y;
 			xPrev = x;
@@ -113,8 +114,7 @@ class gps_to_odom {
 };
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
 	ros::init(argc, argv, "gps_to_odom");
 

@@ -1,10 +1,6 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 #include "nav_msgs/Odometry.h"
 #include "tf/transform_broadcaster.h"
-#include <stdlib.h>
-#include <cmath>  
-#include <sstream>
 
 class odom_to_tf {
 
@@ -13,6 +9,7 @@ class odom_to_tf {
         ros::Subscriber sub;
         tf::TransformBroadcaster br;
         std::string input_odom, child_frame, root_frame;
+   
     public:
         void odomCallBack(const nav_msgs::Odometry::ConstPtr& msg){
             tf::Transform transform;
@@ -33,9 +30,8 @@ class odom_to_tf {
 };
 
 
-int main(int argc, char *argv[])
-{
-
+int main(int argc, char *argv[]) {
+    
 	ros::init(argc, argv, "odom_to_tf");
 
 	odom_to_tf node;
