@@ -59,6 +59,12 @@ class gps_to_odom {
 	
 			double x, y, z;
 			ECEFtoENU(&x, &y, &z, X, Y, Z);
+
+			double xRotated, yRotated;
+			xRotated = cos(145.0*M_PI/180.0)*x - sin(145.0*M_PI/180.0)*y;
+			xRotated = sin(145.0*M_PI/180.0)*x + cos(145.0*M_PI/180.0)*y;
+			x = xRotated;
+			y = yRotated;
 	
 			retval.pose.pose.position.x = x;
 			retval.pose.pose.position.y = y;
