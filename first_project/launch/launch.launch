@@ -13,4 +13,6 @@
     <param name="child_frame" value="wheel_odom" type="str"/>
     <param name="root_frame" value="world" type="str"/>
 </node>
+<node pkg="first_project" name="lidar_remap" type="lidar_remap" output="screen" />
+<node pkg="rviz" name="rviz" type="rviz" output="screen" args="-d $(find first_project)/rviz/configfile.rviz"/>
 </launch>

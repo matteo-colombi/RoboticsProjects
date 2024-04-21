@@ -9,6 +9,7 @@
 #define A 6378137
 #define B 6356752
 #define E_SQUARE 0.006694478198
+#define ANGLE_CORRECTION 128.352
 
 class gps_to_odom {
 
@@ -60,9 +61,14 @@ class gps_to_odom {
 			double x, y, z;
 			ECEFtoENU(&x, &y, &z, X, Y, Z);
 
+			double dx = x-xPrev;
+			double dy = y-yPrev;
+
+			updateHeading(dx, dy);
+
 			double xRotated, yRotated;
-			xRotated = cos(145.0*M_PI/180.0)*x - sin(145.0*M_PI/180.0)*y;
-			xRotated = sin(145.0*M_PI/180.0)*x + cos(145.0*M_PI/180.0)*y;
+			xRotated = cos(ANGLE_CORRECTION*M_PI/180.0)*x - sin(ANGLE_CORRECTION*M_PI/180.0)*y;
+			yRotated = sin(ANGLE_CORRECTION*M_PI/180.0)*x + cos(ANGLE_CORRECTION*M_PI/180.0)*y;
 			x = xRotated;
 			y = yRotated;
 	
@@ -74,11 +80,6 @@ class gps_to_odom {
 			retval.pose.pose.orientation.z = cos(heading/2);
 			retval.pose.pose.orientation.x = 0;
 			retval.pose.pose.orientation.y = 0;
-
-			double dx = x-xPrev;
-			double dy = y-yPrev;
-
-			updateHeading(dx, dy);
 
 			yPrev = y;
 			xPrev = x;
