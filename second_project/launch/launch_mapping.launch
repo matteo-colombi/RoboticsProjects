@@ -1,0 +1,37 @@
+<launch>
+
+  <param name="use_sim_time" value="true"/>
+
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
+    <remap from="/cloud_in" to="/pointcloud_remapped" />
+    <remap from="/scan" to="/base_scan" />
+    <param name="min_height" value="0.2" />
+    <param name="max_height" value="0.6" />
+    <param name="angle_min" value="-3.14" />
+    <param name="angle_max" value="3.14" />
+    <param name="angle_increment" value="0.004" />
+    <param name="range_max" value="10.0" />
+
+  </node>
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="laser_odom_transform" args="0 0 0 0 0 0 1 base_link base_laser_link" />
+
+  <node pkg="second_project" name="odom_tf_publisher" type="odom_tf_publisher" output="screen" >
+    <param name="input_odom" value="/ugv/odom" type="str"/>
+    <param name="child_frame" value="base_link" type="str"/>
+    <param name="root_frame" value="odom" type="str"/>
+  </node>
+
+  <node pkg="second_project" name="pointcloud_remap" type="pointcloud_remap" output="screen" >
+    <param name="input_topic" value="/ugv/rslidar_points" type="str"/>
+    <param name="output_topic" value="/pointcloud_remapped" type="str"/>
+    <param name="sensor_frame" value="base_laser_link" type="str"/>
+  </node>
+
+  <node pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="screen">
+    <rosparam command="load" file="$(find second_project)/config/mapper_params.yaml" />
+  </node>
+
+  <node pkg="rviz" name="rviz" type="rviz" output="screen" args="-d $(find second_project)/config/rviz_cfg.rviz"/>
+
+</launch>
